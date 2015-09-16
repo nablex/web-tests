@@ -1,0 +1,48 @@
+.dropdown-menu a {
+	cursor: pointer;
+}
+
+.navbar-header img {
+	margin-top: -8px;
+}
+
+li.level-1 {
+	padding-left: 15;
+}
+
+li.level-2 {
+	padding-left: 30;
+}
+li.level-3 {
+	padding-left: 45;
+}
+
+/* Important for the positioning in the tree */
+ul.nav ul.tree {
+	position: static;
+}
+
+/* Because we use a fixed header with the default 50px height */
+body { 
+	padding-top: 50px; 
+}
+
+#log {
+	position: absolute;
+	display:none;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	background-color: #333333;
+	color: #FFFFFF;
+	height: 50%;
+	padding: 10px;
+	font-family: Courier;
+	font-size: 9pt;
+	overflow: auto;
+	z-index: 10000 !important;
+}
+
+span.checked {
+	margin-left: 5px;
+}

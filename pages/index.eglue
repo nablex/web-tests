@@ -1,0 +1,161 @@
+<html ng-app="glueTests">
+	<head>
+		<title>Glue Tests</title>
+		<!-- External scripts -->
+		<script src='/resources/javascript/components/angular/angular.min.js'></script>
+		<script src='/resources/javascript/components/jquery/dist/jquery.min.js'></script>
+		<script src='/resources/javascript/components/bootstrap/dist/js/bootstrap.min.js'></script>
+		<script src='/resources/javascript/components/angular-route/angular-route.min.js'></script>
+		<script src='/resources/javascript/components/angular-ui/build/angular-ui.min.js'></script>
+		<script src='/resources/javascript/components/angular-bootstrap/ui-bootstrap-tpls.min.js'></script>
+		<script src='/resources/javascript/components/angular-local-storage/dist/angular-local-storage.min.js'></script>
+		<script src='/resources/javascript/components/angular-bootstrap-nav-tree/dist/abn_tree_directive.js'></script>
+		<script src='/resources/javascript/components/angular-animate/angular-animate.min.js'></script>
+		
+		<!-- d3 animation -->
+		<script src='/resources/javascript/components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js'></script>
+		<script src='/resources/javascript/components/d3/d3.min.js'></script>
+		<script src='/resources/javascript/components/nvd3/nv.d3.min.js'></script>
+		
+		<link rel='stylesheet' type='text/css' href='/resources/javascript/components/bootstrap/dist/css/bootstrap.min.css'/>
+		<link rel='stylesheet' type='text/css' href='/resources/javascript/components/bootstrap/dist/css/bootstrap-theme.min.css'/>
+		<link rel='stylesheet' type='text/css' href='/resources/javascript/components/angular/angular-csp.css'/>
+		<link rel='stylesheet' type='text/css' href='/resources/css/main.css'/>
+		<link rel='stylesheet' type='text/css' href='/resources/css/dashboard.css'/>
+		
+		<link rel='stylesheet' type='text/css' href='/resources/javascript/components/nvd3/nv.d3.min.css'/>
+		
+		<!-- Recursive templates -->
+		<script type="text/ng-template" id="tree-renderer.html">
+			<a ng-click="toggleInterestedProject(project.id);$event.stopPropagation();" ng-show="project.id">
+				{{project.name}}
+				<span ng-show="project.id && isInterestedProject(project.id)" class="glyphicon glyphicon-ok checked" aria-hidden="true"></span>
+			</a>
+			<a ng-hide="project.id" onclick="$(this).parent().children('ul.tree').toggle(200);event.stopPropagation()">{{project.name}} <span class="caret"></span></a>
+			<ul class="dropdown-menu tree" id="project-navbar-{{project.path}}">
+				<li class="level-{{getProjectLevel(project.path)}}" ng-repeat="project in project.children | orderBy: child.name" ng-include="'tree-renderer.html'"></li>
+			</ul>
+		</script>
+	
+		<!-- Main javascript -->
+		<script src="/resources/javascript/main.js"></script>
+		<!-- Controllers -->
+		<script src='/resources/javascript/controllers/main.controller.js'></script>
+	</head>
+	<body ng-controller="mainController">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar-collapse-1" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" alt="Glue" href="http://nabu.be"><img src='/resources/images/glue-logo-small.png'/></a>
+					<a class="navbar-brand" alt="Glue" href="http://nabu.be">Glue</a>
+				</div>
+				 <div class="collapse navbar-collapse" id="main-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="/">Home</a></li>
+						
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role=button" aria-haspopup="true" aria-expanded="true">Projects <span class="caret"></span></a>
+							<ul class="dropdown-menu dropdown" expand-level="1">
+								<li ng-repeat="project in projects | orderBy: project.name" ng-include="'tree-renderer.html'"></li>
+							</ul>
+						</li>
+						
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role=button" aria-haspopup="true" aria-expanded="true">Environments <span class="caret"></span></a>
+							<ul class="dropdown-menu dropdown" expand-level="1">
+								<li ng-repeat="environment in environments | orderBy: environment">
+									<a ng-click="toggleInterestedEnvironment(environment);$event.stopPropagation();">
+										{{environment}}
+										<span ng-show="isInterestedInEnvironment(environment)" class="glyphicon glyphicon-ok checked" aria-hidden="true"></span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li><a ng-click="reset()" href="#">Reset</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		
+		<div class="alert alert-info" role="alert" ng-show="interestedEnvironments.length == 0 && interestedProjects.length != 0">Please select an environment</div>
+		<div class="alert alert-info" role="alert" ng-show="interestedEnvironments.length != 0 && interestedProjects.length == 0">Please select a project</div>
+		<div class="alert alert-info" role="alert" ng-show="interestedEnvironments.length == 0 && interestedProjects.length == 0">Please select a project and an environment</div>
+		
+		<div id="panel-{{compiledDashboard.projectId.replace('/', '-')}}" ng-repeat="compiledDashboard in compiledDashboards | orderBy: 'projectId'" class="panel panel-default dashboard">
+			<div class="panel-heading">
+				<h3 class="panel-title"><small>{{getProjectCategory(compiledDashboard.projectId)}}</small>{{getProjectName(compiledDashboard.projectId)}}</h3>
+			</div>
+			<div class="panel-body">
+				<div ng-repeat="compiledEnvironment in compiledDashboard.environments | orderBy: 'environment'" ng-show="isInterestedInEnvironment(compiledEnvironment.environment)" ng-init="dashboard = compiledEnvironment.dashboards[compiledEnvironment.dashboards.length - 1]" class="environment">
+					<div class="main">
+						<a class="name" data-toggle="collapse" role="button" aria-controls="dashboard-{{dashboard.projectId.replace('/', '-')}}-{{dashboard.environment}}" aria-expanded="false" href="#dashboard-{{dashboard.projectId.replace('/', '-')}}-{{dashboard.environment}}">{{dashboard.environment}}</a> <span class="badge">{{Math.round(100 * (dashboard.amountSuccessful / dashboard.amountRun))}}%</span><br/>
+						<span class="runtime">{{formatDate(dashboard.started)}}</span><br/>
+						<span class="runtime" ng-show="getRuntime(dashboard.started, dashboard.stopped) >= 0">{{getRuntime(dashboard.started, dashboard.stopped)}} min</span>
+					</div>
+					
+					<div class="collapse clear" id="dashboard-{{dashboard.projectId.replace('/', '-')}}-{{dashboard.environment}}">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<td>Script</td>
+									<td>Runtime</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="result in dashboard.results | orderBy: 'stopped' : true" ng-show="result.level == 'ERROR'" ng-class="result.stopped == null ? 'exception' : result.level.toLowerCase()">
+									<td>
+										<span class="namespace">{{result.namespace}}</span><br/>
+										<span class="name">{{result.name}}</span>
+									</td>
+									<td>
+										<span ng-show="getRuntimeInSeconds(result.started, result.stopped) >= 0">{{getRuntimeInSeconds(result.started, result.stopped)}}s</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<nvd3-line-chart
+						id="graph-{{dashboard.projectId.replace('/', '-')}}-{{dashboard.environment}}"
+						data="compiledEnvironment.graphData"
+						width="{{getChartWidth(dashboard.projectId)}}"
+						height="200"
+						showXAxis="false"
+						showYAxis="true"
+						useInteractiveGuideLine="true"
+						interactive="true"
+						tooltips="true"
+						x="xDataFunction(compiledEnvironment.dates)"
+						y="yDataFunction(compiledEnvironment.mostRun)"
+						xAxisTickFormat="xFormattingFunction(compiledEnvironment.dates)"
+						yAxisTickFormat="yFormattingFunction(compiledEnvironment.mostRun)"
+						margin="{left:50,top:10,bottom:10,right:10}"
+						>
+						<svg style="height:200px"></svg>
+					</nvd3-line-chart>
+					<!--<nvd3-multi-bar-chart data="compiledEnvironment.graphData"
+							x="xFormattingFunction()"
+							y="yFormattingFunction()"
+							showLegend="true"
+							showXAxis="true"
+							showYAxis="true"
+							width="550"
+							height="350"
+							showValues="true"
+							showControls="true"
+							stacked="true">
+						<svg style="height:350px"></svg>
+					</nvd3-multi-bar-chart>-->
+				</div>
+			</div>
+		</div>
+		
+		<div id="log"></div>
+	</body>
+</html>
+

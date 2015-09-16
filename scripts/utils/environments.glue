@@ -1,0 +1,12 @@
+location ?= environment("location")
+
+environments = array()
+for (file : file.list(location, directoryRegex: ".*"))
+	switch(isProject(location + "/" + file)/isProject)
+		case(true)
+			for (potentialEnvironment : file.list(location + "/" + file, directoryRegex: ".*"))
+				if (exists(location + "/" + file + "/dashboard." + potentialEnvironment + ".xml"))
+					environments = unique(array(environments, potentialEnvironment))
+		default
+			environments = unique(array(environments, utils.environments(location + "/" + file)/environments))
+

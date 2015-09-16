@@ -1,0 +1,12 @@
+@path {projectId: .+}/{environment}/{amount: [0-9]+}
+
+@path
+projectId ?= null
+
+@path
+environment ?= null
+
+@path
+integer amount ?= null
+
+response.content(structure(ids: getLastDashboardIds(projectId, environment, amount)/ids))

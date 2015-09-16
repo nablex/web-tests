@@ -1,0 +1,17 @@
+@get
+projects ?= null
+confirmNotNull("Must provide a comma-separated list of projects", projects)
+
+@get
+environments ?= null
+confirmNotNull("Must provide a comma-separated list of environments", environments)
+
+@get
+integer amount ?= 10
+
+for (project : split(",", projects))
+	projectDashboards = array()
+	for (environment : split(",", environments))
+		dashboards = array(dashboards, project.getLastDashboards(project, environment, amount)/dashboards)
+
+response.content(dashboards)

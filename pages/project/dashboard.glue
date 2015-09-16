@@ -1,0 +1,13 @@
+@path {projectId: .+}/{environment}/{dashboardId}
+
+@path
+projectId ?= null
+
+@path
+environment ?= null
+
+@path
+dashboardId ?= null
+
+response.content(xml.objectify(string(getDashboard(projectId, environment, dashboardId)/dashboardPath)))
+

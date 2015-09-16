@@ -1,0 +1,8 @@
+location ?= system.pwd()
+
+isProject = false
+
+for (file : file.list(location, directoryRegex: ".*"))
+	if (exists(location + "/dashboard." + file + ".xml"))
+		isProject = true
+		break

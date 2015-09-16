@@ -1,0 +1,23 @@
+projectId ?= null
+environment ?= null
+dashboardId ?= null
+root ?= environment("location")
+
+confirmNotNull("The root folder of the tests must be configured in the project properties", root)
+
+switch 
+	# The latest can be quickly accessed
+	case (dashboardId == "latest")
+		debug("Loading dashboard for '" + projectId + "' in '" + environment + "'")
+		dashboardPath = root + "/" + replace("\.", "/", projectId) + "/dashboard." + environment + ".xml"
+		debug("Loading dashboard: " + dashboardPath)
+		confirmTrue("The 'latest' dashboard file must exist", file.exists(dashboardPath))
+		response.content(xml.objectify(string(dashboardPath)))
+	default
+		debug("Loading dashboard '" + dashboardId + "' for '" + projectId + "' in '" + environment + "'")
+		dashboardPath = root + "/" + replace("\.", "/", projectId) + "/" + environment + "/" + replace("^([0-9]{4}).*", "$1", dashboardId) + "/" 
+			+ replace("^[0-9]{4}([0-9]{2}).*", "$1", dashboardId) + "/"
+			+ replace("^[0-9]{4}[0-9]{2}([0-9]{2}).*", "$1", dashboardId) + "/"
+			+ replace("^[0-9]{4}[0-9]{2}[0-9]{2}([0-9]{6}).*", "$1", dashboardId) + "/"
+			+ "dashboard.xml";
+		confirmTrue("The '" + dashboardId + "' dashboard file must exist", file.exists(dashboardPath))			

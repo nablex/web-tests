@@ -1,0 +1,2 @@
+info(typeof(structure(environments: utils.environments()/environments)))
+response.content(structure(environments: utils.environments()/environments))

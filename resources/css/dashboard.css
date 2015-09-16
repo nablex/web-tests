@@ -1,0 +1,111 @@
+.dashboard {
+	min-width: 20em;
+	display: inline-block;
+	margin: 10px;
+	border: solid 1px #CCCCCC;
+	max-width: calc(100% - 20px);
+	float: left;
+	padding: 0px !important;
+	height: 30em;
+}
+
+.dashboard h3 {
+	font-weight: bold;
+	text-align: center;
+}
+.dashboard h3 small {
+	margin-right: 5px;
+	font-size: 0.6em;
+	display:none;
+}
+.dashboard h3:hover small {
+	display: block;
+	position: absolute;
+	background-color: #FFFFFF;
+	border: solid 1px #CCCCCC;
+	padding: 5px;
+}
+
+.dashboard .progress-label {
+	float: left;
+	margin-right: 1em;
+	width: 10em;
+	text-align: right;
+	padding-right: 5px;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.dashboard .main {
+	text-align: center;
+}
+.dashboard .main a.name {
+	font-size: 3em !important;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.dashboard .runtime {
+	padding: 5px !important;
+	font-weight: normal;
+	color: #AAAAAA;
+	text-align: right;
+}
+.dashboard .main .badge {
+	margin-left: 10px;
+	font-size: 3em;
+}
+
+.dashboard .open {
+	display: block !important;
+	clear: both;
+}
+
+.dashboard table {
+	font-size: 1em;
+	width: 100%;
+	border-color: #333333;
+}
+
+.dashboard table td {
+	padding: 5px;
+	vertical-align: middle;
+}
+
+.dashboard tr.exception {
+	background-color: #ffd5d6;
+	color: #760a09;
+}
+.dashboard tr.error {
+	color: #760a09;
+}
+
+.dashboard table thead {
+	background-color: #333333;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+.dashboard table .namespace {
+	color: #AAAAAA;
+	font-size: 0.8em;
+}
+.dashboard table .name {
+	font-size: 1em;
+}
+
+.dashboard .clear {
+	clear: both;
+}
+@media only screen and (min-device-width: 800px) {
+	.dashboard .environment .name {
+		font-size: 1.5em !important;	
+	}
+
+	.dashboard h3 {
+		font-size: 3em !important;
+	}
+	.dashboard h3 small {
+		font-size: 0.5em;
+	}
+}

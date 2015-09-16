@@ -1,0 +1,28 @@
+projectId ?= null
+environment ?= null
+integer amount ?= null
+root ?= environment("location")
+boolean skipWeekends ?= true
+
+confirmNotNull("The root folder of the tests must be configured in the project properties", root)
+
+path = root + "/" + projectId + "/" + environment
+files = file.list(path, directoryRegex: "[0-9]+", recursive: true)
+# Only keep the file results that point to a dashboard date
+files = retain(".*/[0-9]{6}$", files)
+#files = slice(stop: amount, reverse(sort(files)))
+# Don't slice the array yet, we want to select more intelligently
+files = reverse(sort(files))
+
+days = array()
+for (file : files)
+	if (exists(path + "/" + file + "/dashboard.xml"))
+		day = replace("/[0-9]{6}$", "", file)
+		dayOfWeek = lower(format(parse(day, "yyyy/MM/dd"), "EEEE", language: "en"))
+		if (!contains(day, days))
+			if (!skipWeekends || !contains(dayOfWeek, "saturday", "sunday"))
+				days = array(days, day)
+				dashboard = xml.objectify(string(path + "/" + file + "/dashboard.xml"))
+				dashboards = array(dashboards, structure(dashboard, dashboardId: replace("/", "", file), projectId: projectId, environment: environment))
+				if (size(dashboards) == amount)
+					break

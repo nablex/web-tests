@@ -1,0 +1,21 @@
+location ?= environment("location")
+parent ?= null
+
+projects = array()
+# We want to check if a directory has a matching dashboard file
+# In that case it is an environment directory indicating that the current path is indeed a project
+for (file : file.list(location, directoryRegex: ".*"))
+	project = structure(name: file)
+	switch(parent)
+		case(null)
+			project = structure(project, path: project/name)
+		default
+			project = structure(project, path: parent/path + "/" + project/name)
+	switch(isProject(location + "/" + file)/isProject)
+		case(true)
+			project = structure(project, id: project/path)
+		default
+			project = structure(project, children: utils.projects(location: location + "/" + file, parent: project)/projects)
+	projects = array(projects, project)
+				
+

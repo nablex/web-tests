@@ -1,0 +1,16 @@
+projectId ?= null
+environment ?= null
+integer amount ?= null
+root ?= environment("location")
+
+confirmNotNull("The root folder of the tests must be configured in the project properties", root)
+
+path = root + "/" + projectId + "/" + environment
+files = file.list(path, directoryRegex: "[0-9]+", recursive: true)
+files = slice(stop: amount, reverse(sort(files)))
+
+for (file : files)
+	echo(path + "/" + file + "/dashboard.xml<br/>")
+	if (exists(path + "/" + file + "/dashboard.xml"))
+		ids = array(ids, replace("/", "", file))
+		
